@@ -10,17 +10,18 @@ use ServerPilotAPI\Resources\Resource;
 
 class SystemUsers extends Resource
 {
+    protected function request($object_id=null, $data=array()) {
+    	$path = '/sysusers';
+    	
+    	if(!is_null($object_id)) {
+	    	$path .= '/' . $object_id;
+    	}
     
-    protected function request($method, $data=array()) {
-    	$resource = '/sysusers';
-    
-    	$response = $this->transport->request($resource, $method, $data);
-    
-	    return $response;
+	    return parent::request($path, $data);
     }
     
 	public function listAll() {
-		$results = $this->request('');
+		$results = $this->request();
 		
 		return $results->data;
 	}

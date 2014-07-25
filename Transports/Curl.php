@@ -18,12 +18,8 @@ class Curl extends Transport
 	 *
 	 * @return void
 	 */
-	public function request($resource, $method=null, $data=array()) {
-		$path = $this->apiURL . $resource;
-		
-		if($method) {
-			$path .= '/' . $method;
-		}
+	public function request($path, $data=array()) {
+		$path = $this->apiURL . $path;
 		
 		$ch = curl_init($path);
 		// general
