@@ -6,6 +6,13 @@ class Resource
 {
 	/**  Location for overloaded data.  */
     protected $data = array();
+    
+	public function __construct()
+	{
+		$args = func_get_args();
+		
+		$this->transport = end($args); reset($args);
+	}
 	
 	/**  Local Setter  */
 	public function __set($name, $value)
@@ -29,8 +36,8 @@ class Resource
         return null;
     }
     
-    protected function request($resource, $method, $data=array()) {
-    	$response = $this->transport->request($resource, $method, $data);
+    protected function request($path, $data=array()) {
+    	$response = $this->transport->request($path, $data);
     
 	    return $response;
     }

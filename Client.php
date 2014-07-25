@@ -42,8 +42,11 @@ class Client
         if(!isset($this->$name)) {
        		require_once __DIR__ . '/Resources/' . $name . '.php';
        		$class = "ServerPilotAPI\\Resources\\$name";
-       		$this->$name = new $class($arguments);
-       		$this->$name->transport = $this->transport;
+       		
+       		$arguments[] = $this->transport;
+       		
+       		$reflector = new \ReflectionClass($class);
+	   		$this->$name = $reflector->newInstanceArgs($arguments);
         }
         
         return $this->$name;    
