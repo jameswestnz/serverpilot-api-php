@@ -20,8 +20,14 @@ class Databases extends Resource
 	    return parent::request($path, $data);
     }
     
-	public function listAll() {
+	public function listAll($server_id=null, $app_id=null) {
 		$results = $this->request();
+		
+		if(!is_null($server_id) || !is_null($app_id)) {
+			foreach($results->data as $key => $result) {
+				if((!is_null($server_id) && $result->serverid != $server_id) || (!is_null($app_id) && $result->appid != $app_id)) unset($results->data[$key]);
+			}
+		}
 		
 		return $results->data;
 	}

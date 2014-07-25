@@ -20,8 +20,14 @@ class SystemUsers extends Resource
 	    return parent::request($path, $data);
     }
     
-	public function listAll() {
+	public function listAll($server_id=null) {
 		$results = $this->request();
+		
+		if(!is_null($server_id)) {
+			foreach($results->data as $key => $result) {
+				if($result->serverid != $server_id) unset($results->data[$key]);
+			}
+		}
 		
 		return $results->data;
 	}
