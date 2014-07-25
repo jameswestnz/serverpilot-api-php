@@ -20,8 +20,8 @@ class Servers extends Resource
     }
     
 	public function listAll() {
-		$results = $this->request('', array());
+		$results = $this->request('');
 		
-		return $results;
+		return $results->data;
 	}
 }
