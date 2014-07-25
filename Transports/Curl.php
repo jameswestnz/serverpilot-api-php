@@ -26,9 +26,6 @@ class Curl extends Transport
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->requestTimeout);
         curl_setopt($ch, CURLOPT_USERAGENT, 'ServerPilot PHP Wrapper');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        	'Accept: application/json'
-        ));
         curl_setopt($ch, CURLOPT_ENCODING, 'gzip');
         
 		// ssl
@@ -45,6 +42,7 @@ class Curl extends Transport
 		// POST
 		if(!empty($data)) {
 			$data = json_encode($data);
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST"); // needs to RESTful
 	        curl_setopt($ch, CURLOPT_POST, 1);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 	        curl_setopt($ch, CURLOPT_HTTPHEADER, array(                                                                          
@@ -60,10 +58,19 @@ class Curl extends Transport
 		
         curl_close($ch);
         
-        // need to check headers/response and ensure no errors
-        // should probably throw an exception if not a 200
+        // if we get here, assume we have a JSON string - decode
+        if($response = json_decode($response)) {
+	        // check for any SP specific errors
+	        if(!empty($response->error)) {
+		        throw new \Exception('ServerPilot Error: ' . $response->error);
+	        }
+        }
         
-        $response = json_decode($response);
+        // need to check headers/response and ensure no errors
+        // last fallback
+        if($status_code !== 200) {
+	        throw new \Exception('HTTP Error ' . $status_code);
+        }
         
         return $response;
 	}
