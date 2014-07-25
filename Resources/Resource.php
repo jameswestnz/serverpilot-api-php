@@ -6,11 +6,6 @@ class Resource
 {
 	/**  Location for overloaded data.  */
     protected $data = array();
-    
-	public function __construct($transport)
-	{
-		$this->transport = $transport;
-	}
 	
 	/**  Local Setter  */
 	public function __set($name, $value)
