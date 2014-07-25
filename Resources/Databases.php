@@ -31,4 +31,22 @@ class Databases extends Resource
 		
 		return $results->data;
 	}
+	
+	public function create($app_id, $name, $username, $password) {
+		$name = strtolower(preg_replace("/[^A-Za-z0-9 ]/", '', $name));
+		$username = strtolower(preg_replace("/[^A-Za-z0-9 ]/", '', $username));
+	
+		$data = array(
+			'appid'		=>	$app_id,
+			'name'		=>	$name,
+			'user'		=>	array(
+				'name' => $username,
+				'password' => $password
+			)
+		);
+	
+		$results = $this->request(null, $data);
+		
+		return $results;
+	}
 }
