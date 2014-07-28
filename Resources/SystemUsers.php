@@ -29,6 +29,6 @@ class SystemUsers extends Resource
 			}
 		}
 		
-		return $results->data;
+		return $results;
 	}
 }

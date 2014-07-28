@@ -23,6 +23,6 @@ class Servers extends Resource
 	public function listAll() {
 		$results = $this->request();
 		
-		return $results->data;
+		return $results;
 	}
 }
