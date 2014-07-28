@@ -39,17 +39,11 @@ class Client
 	
 	public function __call($name, $arguments)
     {
-        if(!isset($this->$name)) {
-       		require_once __DIR__ . '/Resources/' . $name . '.php';
-       		$class = "ServerPilotAPI\\Resources\\$name";
-       		
-       		$arguments[] = $this->transport;
-       		
-       		$reflector = new \ReflectionClass($class);
-	   		$this->$name = $reflector->newInstanceArgs($arguments);
-        }
-        
-        return $this->$name;    
+    	if(!isset($this->$name)) {
+	       	require_once __DIR__ . '/Resources/Resource.php';
+		   	$this->$name = Resources\Resource::loadResource($name, $arguments);
+	    }
+	    
+	    return $this->$name;    
     }
-	
 }

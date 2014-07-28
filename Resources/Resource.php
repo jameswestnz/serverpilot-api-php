@@ -41,4 +41,22 @@ class Resource
     
 	    return $response;
     }
+    
+    public function loadResource($name, $arguments=array()) {
+    	if(!isset($this->$name)) {
+	    	$path = __DIR__ . '/' . $name . '.php';
+	    
+	    	if(!file_exists($path)) throw new \Exception('Resource not found.');
+	    
+	   		require_once $path;
+	   		$class = "ServerPilotAPI\\Resources\\$name";
+	   		
+	   		$arguments[] = $this->transport;
+	   		
+	   		$reflector = new \ReflectionClass($class);
+	   		$this->$name = $reflector->newInstanceArgs($arguments);
+	   	}
+	   	
+	   	return $this->$name;
+    }
 }
