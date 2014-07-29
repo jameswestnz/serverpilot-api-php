@@ -7,6 +7,8 @@ class Resource
 	/**  Location for overloaded data.  */
     protected $data = array();
     
+    static $resources = array();
+    
 	public function __construct()
 	{
 		$args = func_get_args();
@@ -43,7 +45,7 @@ class Resource
     }
     
     public function loadResource($name, $arguments=array()) {
-    	if(!isset($this->$name)) {
+    	if(!isset(self::$resources[$name])) {
 	    	$path = __DIR__ . '/' . $name . '.php';
 	    
 	    	if(!file_exists($path)) throw new \Exception('Resource not found.');
@@ -54,9 +56,9 @@ class Resource
 	   		$arguments[] = $this->transport;
 	   		
 	   		$reflector = new \ReflectionClass($class);
-	   		$this->$name = $reflector->newInstanceArgs($arguments);
+	   		self::$resources[$name] = $reflector->newInstanceArgs($arguments);
 	   	}
 	   	
-	   	return $this->$name;
+	   	return self::$resources[$name];
     }
 }

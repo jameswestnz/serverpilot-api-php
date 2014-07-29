@@ -10,8 +10,7 @@ class Client
 	public function __construct($client_id, $api_key, $transport = null)
 	{
 		if(is_null($transport)) {
-			require_once __DIR__ . '/Transports/Curl.php';
-			$transport = new \ServerPilotAPI\Transports\Curl($client_id, $api_key);
+			$transport = $this->loadTransport('Curl', $client_id, $api_key);
 		}
 		
 		$this->transport = $transport;
@@ -39,11 +38,13 @@ class Client
 	
 	public function __call($name, $arguments)
     {
-    	if(!isset($this->$name)) {
-	       	require_once __DIR__ . '/Resources/Resource.php';
-		   	$this->$name = Resources\Resource::loadResource($name, $arguments);
-	    }
-	    
-	    return $this->$name;    
+       	require_once __DIR__ . '/Resources/Resource.php';
+	   	return Resources\Resource::loadResource($name, $arguments); 
+    }
+    
+    public function loadTransport($name, $client_id, $api_key) {
+	    require_once __DIR__ . '/Transports/' . $name . '.php';
+	   	$class = "ServerPilotAPI\\Transports\\$name";
+		return new $class($client_id, $api_key);
     }
 }
