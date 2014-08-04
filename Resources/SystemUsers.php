@@ -31,4 +31,17 @@ class SystemUsers extends Resource
 		
 		return $results;
 	}
+	
+	public function create($serverid, $username, $password) {
+	
+		$data = array(
+			'serverid'	=>	$serverid,
+			'name'		=>	$username,
+			'password'	=>	$password,
+		);
+	
+		$results = $this->request(null, $data);
+		
+		return $results;
+	}
 }

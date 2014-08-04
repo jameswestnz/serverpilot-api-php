@@ -24,6 +24,10 @@ $servers = $ServerPilot->Servers()->listAll();
 ```php
 $sysusers = $ServerPilot->SystemUsers()->listAll($server_id=null);
 ```
+#### Create a sysuser
+```php
+$app = $ServerPilot->SystemUsers()->create($serverid, $username, $password);
+```
 
 ### Apps
 
