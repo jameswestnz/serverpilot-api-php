@@ -5,7 +5,7 @@ namespace ServerPilotAPI\Transports;
 class Transport
 {
 	public $cacheTime = 3600;
-	public $requestTimeout = 10;
+	public $requestTimeout = 30;
 	public $apiURL = 'https://api.serverpilot.io/v1';
 	
 	/**  Location for overloaded data.  */
