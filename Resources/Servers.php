@@ -25,4 +25,10 @@ class Servers extends Resource
 		
 		return $results;
 	}
+	
+	public function read($server_id) {
+		$results = $this->request($server_id);
+		
+		return $results;
+	}
 }
