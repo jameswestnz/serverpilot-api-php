@@ -39,8 +39,13 @@ class Client
 	public function __call($name, $arguments)
     {
        	require_once __DIR__ . '/Resources/Resource.php';
-       	$resource = new Resources\Resource($this->transport);
-	   	return $resource->loadResource($name, $arguments); 
+	   	
+	   	$arguments = array_merge(array(
+	   		$name,
+	   		$this->transport
+	   	), $arguments);
+	   	
+	   	return forward_static_call_array(array('ServerPilotAPI\Resources\Resource', 'getInstance'), $arguments);
     }
     
     public function loadTransport($name, $client_id, $api_key) {

@@ -44,7 +44,7 @@ class Resource
 	    return $response;
     }
     
-    public function loadResource($name, $arguments=array()) {
+    static function getInstance($name, $transport) {
     	if(!isset(self::$resources[$name])) {
 	    	$path = __DIR__ . '/' . $name . '.php';
 	    
@@ -53,12 +53,27 @@ class Resource
 	   		require_once $path;
 	   		$class = "ServerPilotAPI\\Resources\\$name";
 	   		
-	   		$arguments[] = $this->transport;
+	   		$arguments = func_get_args();
+	   		// don;t need the name
+	   		unset($arguments[0]);
+	   		// transport needs to be the last
+	   		unset($arguments[1]);
+	   		
+	   		$arguments[] = $transport;
 	   		
 	   		$reflector = new \ReflectionClass($class);
 	   		self::$resources[$name] = $reflector->newInstanceArgs($arguments);
 	   	}
 	   	
 	   	return self::$resources[$name];
+    }
+    
+    protected function loadResource($name, $arguments=array()) {
+	   	$arguments = array_merge(array(
+	   		$name,
+	   		$this->transport
+	   	), $arguments);
+	   	
+	   	return forward_static_call_array(array('ServerPilotAPI\Resources\Resource', 'getInstance'), $arguments);
     }
 }
