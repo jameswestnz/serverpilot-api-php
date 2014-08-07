@@ -39,7 +39,8 @@ class Client
 	public function __call($name, $arguments)
     {
        	require_once __DIR__ . '/Resources/Resource.php';
-	   	return Resources\Resource::loadResource($name, $arguments); 
+       	$resource = new Resources\Resource($this->transport);
+	   	return $resource->loadResource($name, $arguments); 
     }
     
     public function loadTransport($name, $client_id, $api_key) {
