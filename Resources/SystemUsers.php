@@ -34,7 +34,7 @@ class SystemUsers extends Resource
 			'password'	=>	$password,
 		);
 	
-		$results = $this->request(null, $data);
+		$results = $this->request(null, $data, Transport::SP_HTTP_METHOD_POST);
 		
 		return $results;
 	}

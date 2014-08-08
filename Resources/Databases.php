@@ -39,7 +39,7 @@ class Databases extends Resource
 			)
 		);
 	
-		$results = $this->request(null, $data);
+		$results = $this->request(null, $data, Transport::SP_HTTP_METHOD_POST);
 		
 		return $results;
 	}
