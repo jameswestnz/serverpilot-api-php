@@ -1,11 +1,11 @@
 <?php
-namespace ServerPilotAPI\Transports;
+namespace ServerPilot\Transports;
 
 // load main Transport class for extending
 require_once 'Transport.php';
 
 // now use it
-use ServerPilotAPI\Transports\Transport;
+use ServerPilot\Transports\Transport;
 
 class Curl extends Transport
 {

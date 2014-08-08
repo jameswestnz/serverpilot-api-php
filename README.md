@@ -7,7 +7,7 @@
 ## Create ServerPilot Client
 ```php
 include_once 'ServerPilot-API-PHP-Wrapper/Client.php';
-$ServerPilot = new \ServerPilotAPI\Client('CLIENT_ID', 'API_KEY');
+$ServerPilot = new \ServerPilot\Client('CLIENT_ID', 'API_KEY');
 ```
 ## Resources
 

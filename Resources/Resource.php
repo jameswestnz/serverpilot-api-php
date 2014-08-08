@@ -1,6 +1,6 @@
 <?php
 
-namespace ServerPilotAPI\Resources;
+namespace ServerPilot\Resources;
 
 class Resource
 {
@@ -51,10 +51,10 @@ class Resource
 	    	if(!file_exists($path)) throw new \Exception('Resource not found.');
 	    
 	   		require_once $path;
-	   		$class = "ServerPilotAPI\\Resources\\$name";
+	   		$class = "ServerPilot\\Resources\\$name";
 	   		
 	   		$arguments = func_get_args();
-	   		// don;t need the name
+	   		// don't need the name
 	   		unset($arguments[0]);
 	   		// transport needs to be the last
 	   		unset($arguments[1]);
@@ -74,6 +74,6 @@ class Resource
 	   		$this->transport
 	   	), $arguments);
 	   	
-	   	return forward_static_call_array(array('ServerPilotAPI\Resources\Resource', 'getInstance'), $arguments);
+	   	return forward_static_call_array(array('ServerPilot\Resources\Resource', 'getInstance'), $arguments);
     }
 }

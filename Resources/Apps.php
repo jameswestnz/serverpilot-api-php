@@ -1,12 +1,12 @@
 <?php
 
-namespace ServerPilotAPI\Resources;
+namespace ServerPilot\Resources;
 
 // load main Transport class for extending
 require_once 'Resource.php';
 
 // now use it
-use ServerPilotAPI\Resources\Resource;
+use ServerPilot\Resources\Resource;
 
 class Apps extends Resource
 {
@@ -43,12 +43,6 @@ class Apps extends Resource
 		);
 	
 		$results = $this->request(null, $data);
-		
-		// run a first-check on the action to see if it's been completed
-		// initial tests show that the result is always "open" this soon after the initial request - this code is likely wasteful
-		/*$Actions = $this->loadResource('Actions');
-		$results->action = $Actions->getStatus($results->actionid)->data;
-		unset($results->actionid);*/
 		
 		return $results;
 	}

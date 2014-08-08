@@ -1,12 +1,12 @@
 <?php
 
-namespace ServerPilotAPI\Resources;
+namespace ServerPilot\Resources;
 
 // load main Transport class for extending
 require_once 'Resource.php';
 
 // now use it
-use ServerPilotAPI\Resources\Resource;
+use ServerPilot\Resources\Resource;
 
 class Servers extends Resource
 {
