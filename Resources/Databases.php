@@ -2,6 +2,8 @@
 
 namespace ServerPilot\Resources;
 
+use \ServerPilot\Transports\Transport as Transport;
+
 // load main Transport class for extending
 require_once 'Resource.php';
 
@@ -10,15 +12,7 @@ use ServerPilot\Resources\Resource;
 
 class Databases extends Resource
 {
-    protected function request($object_id=null, $data=array()) {
-    	$path = '/dbs';
-    	
-    	if(!is_null($object_id)) {
-	    	$path .= '/' . $object_id;
-    	}
-    
-	    return parent::request($path, $data);
-    }
+	public $path = '/dbs';
     
 	public function listAll($server_id=null, $app_id=null) {
 		$results = $this->request();

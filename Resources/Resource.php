@@ -2,8 +2,12 @@
 
 namespace ServerPilot\Resources;
 
+use \ServerPilot\Transports\Transport as Transport;
+
 class Resource
 {
+	public $path = '/';
+
 	/**  Location for overloaded data.  */
     protected $data = array();
     
@@ -15,6 +19,31 @@ class Resource
 		
 		$this->transport = end($args); reset($args);
 	}
+	
+	/** static getInstance */
+    static function getInstance($name, $transport) {
+    	if(!isset(self::$resources[$name])) {
+	    	$path = __DIR__ . '/' . $name . '.php';
+	    
+	    	if(!file_exists($path)) throw new \Exception('Resource not found.');
+	    
+	   		require_once $path;
+	   		$class = "ServerPilot\\Resources\\$name";
+	   		
+	   		$arguments = func_get_args();
+	   		// don't need the name
+	   		unset($arguments[0]);
+	   		// transport needs to be the last
+	   		unset($arguments[1]);
+	   		
+	   		$arguments[] = $transport;
+	   		
+	   		$reflector = new \ReflectionClass($class);
+	   		self::$resources[$name] = $reflector->newInstanceArgs($arguments);
+	   	}
+	   	
+	   	return self::$resources[$name];
+    }
 	
 	/**  Local Setter  */
 	public function __set($name, $value)
@@ -38,34 +67,13 @@ class Resource
         return null;
     }
     
-    protected function request($path, $data=array()) {
-    	$response = $this->transport->request($path, $data);
+    // method = Transport::SP_HTTP_METHOD_POST
+    protected function request($relative_path='', $data=array(), $method=null) {
+    	$path = $this->path . $relative_path;
+    
+    	$response = $this->transport->request($path, $data, $method);
     
 	    return $response;
-    }
-    
-    static function getInstance($name, $transport) {
-    	if(!isset(self::$resources[$name])) {
-	    	$path = __DIR__ . '/' . $name . '.php';
-	    
-	    	if(!file_exists($path)) throw new \Exception('Resource not found.');
-	    
-	   		require_once $path;
-	   		$class = "ServerPilot\\Resources\\$name";
-	   		
-	   		$arguments = func_get_args();
-	   		// don't need the name
-	   		unset($arguments[0]);
-	   		// transport needs to be the last
-	   		unset($arguments[1]);
-	   		
-	   		$arguments[] = $transport;
-	   		
-	   		$reflector = new \ReflectionClass($class);
-	   		self::$resources[$name] = $reflector->newInstanceArgs($arguments);
-	   	}
-	   	
-	   	return self::$resources[$name];
     }
     
     protected function loadResource($name, $arguments=array()) {

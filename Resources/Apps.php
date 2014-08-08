@@ -2,6 +2,8 @@
 
 namespace ServerPilot\Resources;
 
+use \ServerPilot\Transports\Transport as Transport;
+
 // load main Transport class for extending
 require_once 'Resource.php';
 
@@ -10,15 +12,7 @@ use ServerPilot\Resources\Resource;
 
 class Apps extends Resource
 {
-    protected function request($object_id=null, $data=array()) {
-    	$path = '/apps';
-    	
-    	if(!is_null($object_id)) {
-	    	$path .= '/' . $object_id;
-    	}
-    
-	    return parent::request($path, $data);
-    }
+	public $path = '/apps';
     
 	public function listAll($server_id=null) {
 		$results = $this->request();
@@ -42,7 +36,13 @@ class Apps extends Resource
 			'domains'	=>	$domains
 		);
 	
-		$results = $this->request(null, $data);
+		$results = $this->request(null, $data, Transport::SP_HTTP_METHOD_POST);
+		
+		return $results;
+	}
+	
+	public function delete($id) {
+		$results = $this->request('/' . $id, null, Transport::SP_HTTP_METHOD_DELETE);
 		
 		return $results;
 	}
