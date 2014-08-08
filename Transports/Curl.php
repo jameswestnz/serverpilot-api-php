@@ -31,15 +31,12 @@ class Curl extends Transport
 			CURLOPT_ENCODING => 'gzip',
 			
 			// ssl
-			CURLOPT_SSL_VERIFYPEER => FALSE,
-			CURLOPT_SSL_VERIFYHOST => FALSE,
+			CURLOPT_SSL_VERIFYPEER => 0,
+			CURLOPT_SSL_VERIFYHOST => 0,
 			
 			// auth
 			CURLOPT_USERPWD => "$this->client_id:$this->api_key",
 			CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-			
-			// request
-			CURLOPT_CUSTOMREQUEST => $method
 		);
 		
 		// send the data
@@ -51,6 +48,7 @@ class Curl extends Transport
 				case Transport::SP_HTTP_METHOD_POST: 
 					$data = json_encode($data);
 					
+					$options[CURLOPT_CUSTOMREQUEST] = Transport::SP_HTTP_METHOD_POST;
 					$options[CURLOPT_POST] = TRUE;
 					$options[CURLOPT_POSTFIELDS] = $data;
 					
@@ -58,6 +56,9 @@ class Curl extends Transport
 					    'Content-Type: application/json',                                                                                
 					    'Content-Length: ' . strlen($data)                                                                      
 					);
+				break;
+				case Transport::SP_HTTP_METHOD_DELETE: 
+					$options[CURLOPT_CUSTOMREQUEST] = Transport::SP_HTTP_METHOD_DELETE;
 				break;
 			}
 		}
@@ -71,6 +72,10 @@ class Curl extends Transport
         //$info = curl_getinfo($ch);
 		
         curl_close($ch);
+        
+        if(empty($response)) {
+			throw new \Exception('ServerPilot Error: Empty Response');
+        }
         
         // if we get here, assume we have a JSON string - decode
         if($response = json_decode($response)) {
