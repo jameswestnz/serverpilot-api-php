@@ -18,43 +18,57 @@ class Curl extends Transport
 	 *
 	 * @return void
 	 */
-	public function request($path, $data=array()) {
-		$path = $this->apiURL . $path;
+	public function request($path, $data=array(), $method=Transport::SP_HTTP_METHOD_GET) {
+		$url = Transport::SP_API_ENDPOINT . $path;
 		
-		$ch = curl_init($path);
-		// general
-        curl_setopt($ch, CURLOPT_TIMEOUT, $this->requestTimeout);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'ServerPilot PHP Wrapper');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_ENCODING, 'gzip');
-        
-		// ssl
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-		//curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-		//curl_setopt($ch, CURLOPT_CAINFO, 'api.serverpilot.io.crt');
-        
-        // auth
-		curl_setopt($ch, CURLOPT_USERPWD, "$this->client_id:$this->api_key");
-		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+		$ch = curl_init();
+		$options = array(
+			// general
+			CURLOPT_URL => $url,
+			CURLOPT_TIMEOUT => $this->requestTimeout,
+			CURLOPT_USERAGENT => Transport::SP_USERAGENT,
+			CURLOPT_RETURNTRANSFER => TRUE,
+			CURLOPT_ENCODING => 'gzip',
+			
+			// ssl
+			CURLOPT_SSL_VERIFYPEER => FALSE,
+			CURLOPT_SSL_VERIFYHOST => FALSE,
+			
+			// auth
+			CURLOPT_USERPWD => "$this->client_id:$this->api_key",
+			CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+			
+			// request
+			CURLOPT_CUSTOMREQUEST => $method
+		);
 		
-		// POST
+		// send the data
 		if(!empty($data)) {
-			$data = json_encode($data);
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST"); // needs to RESTful
-	        curl_setopt($ch, CURLOPT_POST, 1);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-	        curl_setopt($ch, CURLOPT_HTTPHEADER, array(                                                                          
-			    'Content-Type: application/json',                                                                                
-			    'Content-Length: ' . strlen($data)                                                                      
-			));
+			switch($method) {
+				case Transport::SP_HTTP_METHOD_GET:
+					$options[CURLOPT_URL] = $url . '?' . implode('&', $data);
+				break;
+				case Transport::SP_HTTP_METHOD_POST: 
+					$data = json_encode($data);
+					
+					$options[CURLOPT_POST] = TRUE;
+					$options[CURLOPT_POSTFIELDS] = $data;
+					
+					$options[CURLOPT_HTTPHEADER] = array(                                                                          
+					    'Content-Type: application/json',                                                                                
+					    'Content-Length: ' . strlen($data)                                                                      
+					);
+				break;
+			}
 		}
+		
+		// set the options
+		curl_setopt_array($ch, $options);
 		
 		// response
         $response = curl_exec($ch);
-		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $info = curl_getinfo($ch);
+		//$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        //$info = curl_getinfo($ch);
 		
         curl_close($ch);
         
@@ -68,9 +82,10 @@ class Curl extends Transport
         
         // need to check headers/response and ensure no errors
         // last fallback
-        if($status_code !== 200) {
+        // testing for 200 only is dangerous - what about the other success responses?
+        /*if($status_code !== 200) {
 	        throw new \Exception('HTTP Error ' . $status_code);
-        }
+        }*/
         
         return $response;
 	}

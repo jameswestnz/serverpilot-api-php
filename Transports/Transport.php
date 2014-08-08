@@ -4,15 +4,28 @@ namespace ServerPilot\Transports;
 
 class Transport
 {
+	// variables
 	public $cacheTime = 3600;
 	public $requestTimeout = 30;
-	public $apiURL = 'https://api.serverpilot.io/v1';
 	
 	static $transports = array();
+	
+	// constants
+	const SP_API_ENDPOINT		= 'https://api.serverpilot.io/v1';
+	const SP_USERAGENT			= 'ServerPilot-API-PHP-Wrapper';
+	const SP_HTTP_METHOD_POST	= 'post';
+	const SP_HTTP_METHOD_GET	= 'get';
+	const SP_HTTP_METHOD_DELETE	= 'delete';
 	
 	/**  Location for overloaded data.  */
     protected $data = array();
     
+	public function __construct($client_id, $api_key)
+	{
+		$this->setCredentials($client_id, $api_key);
+	}
+	
+	/** static getInstance */
     static function getInstance($name, $client_id, $api_key) {
     	if(!isset(self::$transports[$name])) {
 	    	$path = __DIR__ . '/' . $name . '.php';
@@ -32,11 +45,6 @@ class Transport
 	   	
 	   	return self::$transports[$name];
     }
-    
-	public function __construct($client_id, $api_key)
-	{
-		$this->setCredentials($client_id, $api_key);
-	}
 	
 	/**  Local Setter  */
 	public function __set($name, $value)
