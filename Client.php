@@ -1,6 +1,6 @@
 <?php
 
-namespace ServerPilotAPI;
+namespace ServerPilot;
 
 class Client
 {
@@ -10,7 +10,7 @@ class Client
 	public function __construct($client_id, $api_key, $transport = null)
 	{
 		if(is_null($transport)) {
-			$transport = $this->loadTransport('Curl', $client_id, $api_key);
+			$transport = self::getTransport('Curl', $client_id, $api_key);
 		}
 		
 		$this->transport = $transport;
@@ -45,12 +45,22 @@ class Client
 	   		$this->transport
 	   	), $arguments);
 	   	
-	   	return forward_static_call_array(array('ServerPilotAPI\Resources\Resource', 'getInstance'), $arguments);
+	   	return forward_static_call_array(array('ServerPilot\Client', 'getResource'), $arguments);
     }
     
-    public function loadTransport($name, $client_id, $api_key) {
-	    require_once __DIR__ . '/Transports/' . $name . '.php';
-	   	$class = "ServerPilotAPI\\Transports\\$name";
-		return new $class($client_id, $api_key);
+    static function getTransport($name, $client_id, $api_key) {
+       	require_once __DIR__ . '/Transports/Transport.php';
+	   	
+	   	$arguments = func_get_args();
+	   	
+	   	return forward_static_call_array(array('ServerPilot\Transports\Transport', 'getInstance'), $arguments);
+    }
+    
+    static function getResource($name, $transport) {
+       	require_once __DIR__ . '/Resources/Resource.php';
+	   	
+	   	$arguments = func_get_args();
+	   	
+	   	return forward_static_call_array(array('ServerPilot\Resources\Resource', 'getInstance'), $arguments);
     }
 }
