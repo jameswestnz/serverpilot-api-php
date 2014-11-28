@@ -46,4 +46,22 @@ class Apps extends Resource
 		
 		return $results;
 	}
+	
+	public function addSSL($app_id, $key, $cert, $cacerts=null) {
+		$data = array(
+			'key'		=>	$key,
+			'cert'		=>	$cert,
+			'cacerts'	=>	$cacerts
+		);
+	
+		$results = $this->request('/' . $app_id . '/ssl', $data, Transport::SP_HTTP_METHOD_POST);
+		
+		return $results;
+	}
+	
+	public function deleteSSL($app_id) {
+		$results = $this->request('/' . $app_id . '/ssl', null, Transport::SP_HTTP_METHOD_DELETE);
+		
+		return $results;
+	}
 }
