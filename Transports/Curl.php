@@ -40,8 +40,8 @@ class Curl extends Transport
 		);
 		
 		// send the data
-		if(!empty($data)) {
-			switch($method) {
+		if (!empty($data) || $method == Transport::SP_HTTP_METHOD_DELETE) {
+			switch ($method) {
 				case Transport::SP_HTTP_METHOD_GET:
 					$options[CURLOPT_URL] = $url . '?' . implode('&', $data);
 				break;
@@ -68,7 +68,19 @@ class Curl extends Transport
 		
 		// response
         $response = curl_exec($ch);
-		//$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+	
+	$code     = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+	switch ($code) {
+		case 200: break;
+		case 400: throw new \Exception('We could not understand your request. Typically missing a parameter or header.'); break;
+		case 401: throw new \Exception('Either no authentication credentials were provided or they are invalid.'); break;
+		case 402: throw new \Exception('Method is restricted to users on the Coach or Business plan.'); break;
+		case 403: throw new \Exception('Typically when trying to alter or delete protected resources.'); break;
+		case 404: throw new \Exception('You requested a resource that does not exist.'); break;
+		case 409: throw new \Exception('Typically when trying creating a resource that already exists.'); break;
+		case 500: throw new \Exception('Internal server error. Try again at a later time'); break;
+		default:  break;
+	}
         //$info = curl_getinfo($ch);
 		
         curl_close($ch);
