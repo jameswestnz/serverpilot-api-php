@@ -18,7 +18,7 @@ class Curl extends Transport
 	 *
 	 * @return void
 	 */
-	public function request($path, $data=array(), $method=Transport::SP_HTTP_METHOD_GET) {
+	public function request($path, $data=null, $method=Transport::SP_HTTP_METHOD_GET) {
 		$url = Transport::SP_API_ENDPOINT . $path;
 		
 		$ch = curl_init();
@@ -39,28 +39,28 @@ class Curl extends Transport
 			CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
 		);
 		
-		// send the data
-		if(!empty($data)) {
-			switch($method) {
-				case Transport::SP_HTTP_METHOD_GET:
-					$options[CURLOPT_URL] = $url . '?' . implode('&', $data);
-				break;
-				case Transport::SP_HTTP_METHOD_POST: 
-					$data = json_encode($data);
-					
-					$options[CURLOPT_CUSTOMREQUEST] = Transport::SP_HTTP_METHOD_POST;
-					$options[CURLOPT_POST] = TRUE;
-					$options[CURLOPT_POSTFIELDS] = $data;
-					
-					$options[CURLOPT_HTTPHEADER] = array(                                                                          
-					    'Content-Type: application/json',                                                                                
-					    'Content-Length: ' . strlen($data)                                                                      
-					);
-				break;
-				case Transport::SP_HTTP_METHOD_DELETE: 
-					$options[CURLOPT_CUSTOMREQUEST] = Transport::SP_HTTP_METHOD_DELETE;
-				break;
-			}
+		// handle the data
+		switch($method) {
+			case Transport::SP_HTTP_METHOD_GET:
+				if($data !== null && !empty($data)) $options[CURLOPT_URL] = $url . '?' . implode('&', $data);
+			break;
+			case Transport::SP_HTTP_METHOD_POST: 
+				if($data === null || empty($data)) throw new Exception('ServerPilot\Transports\Curl::request() - parameter 2 is required for method Transport::SP_HTTP_METHOD_POST');
+				
+				$data = json_encode($data);
+				
+				$options[CURLOPT_CUSTOMREQUEST] = Transport::SP_HTTP_METHOD_POST;
+				$options[CURLOPT_POST] = TRUE;
+				$options[CURLOPT_POSTFIELDS] = $data;
+				
+				$options[CURLOPT_HTTPHEADER] = array(                                                                          
+				    'Content-Type: application/json',                                                                                
+				    'Content-Length: ' . strlen($data)                                                                      
+				);
+			break;
+			case Transport::SP_HTTP_METHOD_DELETE: 
+				$options[CURLOPT_CUSTOMREQUEST] = Transport::SP_HTTP_METHOD_DELETE;
+			break;
 		}
 		
 		// set the options
@@ -68,30 +68,49 @@ class Curl extends Transport
 		
 		// response
         $response = curl_exec($ch);
-		//$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        //$info = curl_getinfo($ch);
+		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		
+		// check for common errors
+		switch ($status_code) {
+			case 200: break;
+			case 400: throw new Exception('We could not understand your request. Typically missing a parameter or header.'); break;
+			case 401: throw new Exception('Either no authentication credentials were provided or they are invalid.'); break;
+			case 402: throw new Exception('Method is restricted to users on the Coach or Business plan.'); break;
+			case 403: throw new Exception('Typically when trying to alter or delete protected resources.'); break;
+			case 404: throw new Exception('You requested a resource that does not exist.'); break;
+			case 409: throw new Exception('Typically when trying creating a resource that already exists.'); break;
+			case 500: throw new Exception('Internal server error. Try again at a later time.'); break;
+			default:  break;
+		}
+	
+		// close connection	
         curl_close($ch);
         
         if(empty($response)) {
-			throw new \Exception('ServerPilot Error: Empty Response');
+			throw new Exception('Empty Response');
         }
         
         // if we get here, assume we have a JSON string - decode
         if($response = json_decode($response)) {
 	        // check for any SP specific errors
 	        if(!empty($response->error)) {
-		        throw new \Exception('ServerPilot Error: ' . $response->error);
+		        throw new Exception($response->error);
 	        }
         }
         
-        // need to check headers/response and ensure no errors
-        // last fallback
-        // testing for 200 only is dangerous - what about the other success responses?
-        /*if($status_code !== 200) {
-	        throw new \Exception('HTTP Error ' . $status_code);
-        }*/
-        
         return $response;
 	}
+}
+
+/**
+ * ServerPilot Exceptions
+ */
+class Exception extends \Exception {
+    // Redefine the exception so message isn't optional
+    public function __construct($message, $code = 0, Exception $previous = null) {
+        $message = '[ServerPilot]: ' . $message;
+    
+        // make sure everything is assigned properly
+        parent::__construct($message, $code, $previous);
+    }
 }
