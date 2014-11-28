@@ -26,7 +26,7 @@ class Apps extends Resource
 		return $results->data;
 	}
 	
-	public function create($name, $sysuser_id, $runtime='php5.4', $domains=array()) {
+	public function create($name, $sysuser_id, $runtime='php5.6', $domains=array()) {
 		$name = strtolower(preg_replace("/[^A-Za-z0-9 ]/", '', $name));
 	
 		$data = array(
