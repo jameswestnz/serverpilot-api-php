@@ -12,10 +12,10 @@ class Transport
 	
 	// constants
 	const SP_API_ENDPOINT		= 'https://api.serverpilot.io/v1';
-	const SP_USERAGENT			= 'ServerPilot-API-PHP-Wrapper';
-	const SP_HTTP_METHOD_POST	= 'post';
-	const SP_HTTP_METHOD_GET	= 'get';
-	const SP_HTTP_METHOD_DELETE	= 'delete';
+	const SP_USERAGENT			= 'serverpilot-api-php';
+	const SP_HTTP_METHOD_POST	= 'POST';
+	const SP_HTTP_METHOD_GET	= 'GET';
+	const SP_HTTP_METHOD_DELETE	= 'DELETE';
 	
 	/**  Location for overloaded data.  */
     protected $data = array();
