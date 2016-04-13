@@ -1,12 +1,8 @@
 # ServerPilot API PHP Wrapper
 
-```
-**In Development. Feel free to write some code and submit a pull request.**
-```
-
 ## Create ServerPilot Client
 ```php
-include_once 'ServerPilot-API-PHP-Wrapper/Client.php';
+include_once 'serverpilot-api-php/Client.php';
 $ServerPilot = new \ServerPilot\Client('CLIENT_ID', 'API_KEY');
 ```
 ## Resources
