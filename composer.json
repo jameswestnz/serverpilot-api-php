@@ -1,0 +1,31 @@
+{
+  "name": "jameswestnz/serverpilot-api-php",
+  "type": "library",
+  "description": "ServerPilot API wrapper for PHP",
+  "authors": [
+    {
+      "name": "James West",
+      "email": "james@jameswest.co.nz"
+    }
+  ],
+  "keywords": [
+    "serverpilot",
+    "server management",
+    "api",
+    "control panel",
+    "php",
+    "api wrapper"
+  ],
+  "require": {
+    "php": ">=5.2",
+    "ext-curl": "*",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+	  "ServerPilot\\": "",
+	  "ServerPilot\\Transports\\": "Transports/",
+	  "ServerPilot\\Resources\\": "Resources/"
+	}
+  }
+}
