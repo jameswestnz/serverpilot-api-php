@@ -43,4 +43,10 @@ class Databases extends Resource
 		
 		return $results;
 	}
+
+    public function retrieve($databaseid) {
+        $results = $this->request('/' . $databaseid);
+
+        return $results;
+    }
 }
