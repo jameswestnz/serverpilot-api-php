@@ -20,6 +20,7 @@ class Curl extends Transport
 	 */
 	public function request($path, $data=null, $method=Transport::SP_HTTP_METHOD_GET) {
 
+        $header = FALSE;
         $debug = TRUE;
 
 		$url = Transport::SP_API_ENDPOINT . $path;
@@ -34,7 +35,7 @@ class Curl extends Transport
 			CURLOPT_ENCODING => 'gzip',
 
             // debug
-            CURLOPT_HEADER => $debug,
+            CURLOPT_HEADER => $header,
             CURLOPT_VERBOSE => $debug,
 
 			// ssl
@@ -75,6 +76,7 @@ class Curl extends Transport
 
 		// response
         $response = curl_exec($ch);
+        $status = !empty($response);
 		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 		// check for common errors
@@ -90,12 +92,26 @@ class Curl extends Transport
 			default:  break;
 		}
 
+        $output = array(
+            'url'       => $url,
+            'params'    => $data,
+            'status'    => $status,
+            'error'     => empty($response) ? curl_error($ch) : '',
+            'error_no'  => empty($response) ? curl_errno($ch) : '',
+            'http_code' => curl_getinfo($ch, CURLINFO_HTTP_CODE),
+            'debug'     => $debug ? curl_getinfo($ch) : '',
+        );
+
 		// close connection
         curl_close($ch);
 
-        if(empty($response)) {
+        if(!$status) {
 			throw new Exception('Empty Response');
         }
+
+        // remove some weird headers HTTP/1.1 100 Continue or HTTP/1.1 200 OK
+        $response = preg_replace('#HTTP/[\d.]+\s+\d+\s+\w+[\r\n]+#si', '', $response);
+        $response = trim($response);
 
         // if we get here, assume we have a JSON string - decode
         if($response = json_decode($response)) {
@@ -105,7 +121,9 @@ class Curl extends Transport
 	        }
         }
 
-        return $response;
+        $output['data'] = $response;
+
+        return $output;
 	}
 }
 
