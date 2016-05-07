@@ -49,4 +49,10 @@ class Databases extends Resource
 
         return $results;
     }
+
+    public function delete($databaseid) {
+        $results = $this->request('/' . $databaseid, null, Transport::SP_HTTP_METHOD_DELETE);
+
+        return $results;
+    }
 }
