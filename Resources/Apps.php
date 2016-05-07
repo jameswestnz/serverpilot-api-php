@@ -41,6 +41,12 @@ class Apps extends Resource
 		
 		return $results;
 	}
+
+    public function retrieve($appid) {
+        $results = $this->request('/' . $appid);
+
+        return $results;
+    }
 	
 	public function delete($id) {
 		$results = $this->request('/' . $id, null, Transport::SP_HTTP_METHOD_DELETE);
