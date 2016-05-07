@@ -19,8 +19,11 @@ class Curl extends Transport
 	 * @return void
 	 */
 	public function request($path, $data=null, $method=Transport::SP_HTTP_METHOD_GET) {
+
+        $debug = TRUE;
+
 		$url = Transport::SP_API_ENDPOINT . $path;
-		
+
 		$ch = curl_init();
 		$options = array(
 			// general
@@ -29,47 +32,51 @@ class Curl extends Transport
 			CURLOPT_USERAGENT => Transport::SP_USERAGENT,
 			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_ENCODING => 'gzip',
-			
+
+            // debug
+            CURLOPT_HEADER => $debug,
+            CURLOPT_VERBOSE => $debug,
+
 			// ssl
 			CURLOPT_SSL_VERIFYPEER => 0,
 			CURLOPT_SSL_VERIFYHOST => 0,
-			
+
 			// auth
 			CURLOPT_USERPWD => "$this->client_id:$this->api_key",
 			CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
 		);
-		
+
 		// handle the data
 		switch($method) {
 			case Transport::SP_HTTP_METHOD_GET:
 				if($data !== null && !empty($data)) $options[CURLOPT_URL] = $url . '?' . implode('&', $data);
 			break;
-			case Transport::SP_HTTP_METHOD_POST: 
+			case Transport::SP_HTTP_METHOD_POST:
 				if($data === null || empty($data)) throw new Exception('ServerPilot\Transports\Curl::request() - parameter 2 is required for method Transport::SP_HTTP_METHOD_POST');
-				
+
 				$data = json_encode($data);
-				
+
 				$options[CURLOPT_CUSTOMREQUEST] = Transport::SP_HTTP_METHOD_POST;
 				$options[CURLOPT_POST] = TRUE;
 				$options[CURLOPT_POSTFIELDS] = $data;
-				
-				$options[CURLOPT_HTTPHEADER] = array(                                                                          
-				    'Content-Type: application/json',                                                                                
-				    'Content-Length: ' . strlen($data)                                                                      
+
+				$options[CURLOPT_HTTPHEADER] = array(
+				    'Content-Type: application/json',
+				    'Content-Length: ' . strlen($data)
 				);
 			break;
-			case Transport::SP_HTTP_METHOD_DELETE: 
+			case Transport::SP_HTTP_METHOD_DELETE:
 				$options[CURLOPT_CUSTOMREQUEST] = Transport::SP_HTTP_METHOD_DELETE;
 			break;
 		}
-		
+
 		// set the options
 		curl_setopt_array($ch, $options);
-		
+
 		// response
         $response = curl_exec($ch);
 		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		
+
 		// check for common errors
 		switch ($status_code) {
 			case 200: break;
@@ -82,14 +89,14 @@ class Curl extends Transport
 			case 500: throw new Exception('Internal server error. Try again at a later time.'); break;
 			default:  break;
 		}
-	
-		// close connection	
+
+		// close connection
         curl_close($ch);
-        
+
         if(empty($response)) {
 			throw new Exception('Empty Response');
         }
-        
+
         // if we get here, assume we have a JSON string - decode
         if($response = json_decode($response)) {
 	        // check for any SP specific errors
@@ -97,7 +104,7 @@ class Curl extends Transport
 		        throw new Exception($response->error);
 	        }
         }
-        
+
         return $response;
 	}
 }
@@ -109,7 +116,7 @@ class Exception extends \Exception {
     // Redefine the exception so message isn't optional
     public function __construct($message, $code = 0, Exception $previous = null) {
         $message = '[ServerPilot]: ' . $message;
-    
+
         // make sure everything is assigned properly
         parent::__construct($message, $code, $previous);
     }
