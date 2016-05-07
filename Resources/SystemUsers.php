@@ -38,4 +38,10 @@ class SystemUsers extends Resource
 		
 		return $results;
 	}
+
+    public function retrieve($userid) {
+        $results = $this->request('/' . $userid);
+
+        return $results;
+    }
 }
