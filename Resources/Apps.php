@@ -25,25 +25,37 @@ class Apps extends Resource
 		
 		return $results->data;
 	}
-	
-	public function create($name, $sysuser_id, $runtime='php5.6', $domains=array(), $wordpress=null) {
-		$name = strtolower(preg_replace("/[^A-Za-z0-9 ]/", '', $name));
-	
-		$data = array(
-			'name'		=>	$name,
-			'sysuserid'	=>	$sysuser_id,
-			'runtime'	=>	$runtime,
+
+    public function create($name, $sysuser_id, $runtime='php5.6', $domains=array(), $wordpress=null) {
+        $name = strtolower(preg_replace("/[^A-Za-z0-9 ]/", '', $name));
+
+        $data = array(
+            'name'		=>	$name,
+            'sysuserid'	=>	$sysuser_id,
+            'runtime'	=>	$runtime,
             'domains'	=>	$domains,
             'wordpress'	=>	$wordpress
-		);
-	
-		$results = $this->request(null, $data, Transport::SP_HTTP_METHOD_POST);
-		
-		return $results;
-	}
+        );
+
+        $results = $this->request(null, $data, Transport::SP_HTTP_METHOD_POST);
+
+        return $results;
+    }
 
     public function retrieve($appid) {
         $results = $this->request('/' . $appid);
+
+        return $results;
+    }
+
+    public function update($appid, $runtime='php5.6', $domains=array()) {
+
+        $data = array(
+            'runtime'	=>	$runtime,
+            'domains'	=>	$domains
+        );
+
+        $results = $this->request('/' . $appid, $data, Transport::SP_HTTP_METHOD_POST);
 
         return $results;
     }
