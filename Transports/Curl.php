@@ -114,14 +114,14 @@ class Curl extends Transport
         $response = trim($response);
 
         // if we get here, assume we have a JSON string - decode
-        if($response = json_decode($response)) {
+        if($response = json_decode($response, true)) {
 	        // check for any SP specific errors
 	        if(!empty($response->error)) {
 		        throw new Exception($response->error);
 	        }
         }
 
-        $output['data'] = $response;
+        $output['data'] = $response['data'];
 
         return $output;
 	}
