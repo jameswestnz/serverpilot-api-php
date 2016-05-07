@@ -77,28 +77,13 @@ class Curl extends Transport
 		// response
         $response = curl_exec($ch);
         $status = !empty($response);
-		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-		// check for common errors
-		switch ($status_code) {
-			case 200: break;
-			case 400: throw new Exception('We could not understand your request. Typically missing a parameter or header.'); break;
-			case 401: throw new Exception('Either no authentication credentials were provided or they are invalid.'); break;
-			case 402: throw new Exception('Method is restricted to users on the Coach or Business plan.'); break;
-			case 403: throw new Exception('Typically when trying to alter or delete protected resources.'); break;
-            case 404: throw new Exception('You requested a resource that does not exist.'); break;
-            case 405: throw new Exception('Something went wrong with your request or your resource'); break;
-			case 409: throw new Exception('Typically when trying creating a resource that already exists.'); break;
-			case 500: throw new Exception('Internal server error. Try again at a later time.'); break;
-			default:  break;
-		}
 
         $output = array(
             'url'       => $url,
             'params'    => $data,
             'status'    => $status,
-            'error'     => empty($response) ? curl_error($ch) : '',
-            'error_no'  => empty($response) ? curl_errno($ch) : '',
+            'error'     => '',
+            'error_no'  => (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 200) ? curl_getinfo($ch, CURLINFO_HTTP_CODE) : '',
             'http_code' => curl_getinfo($ch, CURLINFO_HTTP_CODE),
             'debug'     => $debug ? curl_getinfo($ch) : '',
         );
@@ -106,23 +91,18 @@ class Curl extends Transport
 		// close connection
         curl_close($ch);
 
-        if(!$status) {
-			throw new Exception('Empty Response');
-        }
 
         // remove some weird headers HTTP/1.1 100 Continue or HTTP/1.1 200 OK
         $response = preg_replace('#HTTP/[\d.]+\s+\d+\s+\w+[\r\n]+#si', '', $response);
         $response = trim($response);
+        $response = json_decode($response, true);
 
-        // if we get here, assume we have a JSON string - decode
-        if($response = json_decode($response, true)) {
-	        // check for any SP specific errors
-	        if(!empty($response->error)) {
-		        throw new Exception($response->error);
-	        }
+        if($output['http_code'] != 200) {
+            $output['error_no'] = $output['http_code'];
+            $output['error'] = $response['error']['message'];
+        } else {
+            $output['data'] = $response['data'];
         }
-
-        $output['data'] = $response['data'];
 
         return $output;
 	}
