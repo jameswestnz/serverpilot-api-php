@@ -44,4 +44,15 @@ class SystemUsers extends Resource
 
         return $results;
     }
+
+    public function update($userid, $password) {
+
+        $data = array(
+            'password'	=>	$password,
+        );
+
+        $results = $this->request('/' . $userid, $data, Transport::SP_HTTP_METHOD_POST);
+
+        return $results;
+    }
 }
