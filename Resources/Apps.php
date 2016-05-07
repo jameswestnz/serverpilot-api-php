@@ -26,14 +26,15 @@ class Apps extends Resource
 		return $results->data;
 	}
 	
-	public function create($name, $sysuser_id, $runtime='php5.6', $domains=array()) {
+	public function create($name, $sysuser_id, $runtime='php5.6', $domains=array(), $wordpress=null) {
 		$name = strtolower(preg_replace("/[^A-Za-z0-9 ]/", '', $name));
 	
 		$data = array(
 			'name'		=>	$name,
 			'sysuserid'	=>	$sysuser_id,
 			'runtime'	=>	$runtime,
-			'domains'	=>	$domains
+            'domains'	=>	$domains,
+            'wordpress'	=>	$wordpress
 		);
 	
 		$results = $this->request(null, $data, Transport::SP_HTTP_METHOD_POST);
