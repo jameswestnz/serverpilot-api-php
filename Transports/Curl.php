@@ -86,7 +86,8 @@ class Curl extends Transport
 			case 401: throw new Exception('Either no authentication credentials were provided or they are invalid.'); break;
 			case 402: throw new Exception('Method is restricted to users on the Coach or Business plan.'); break;
 			case 403: throw new Exception('Typically when trying to alter or delete protected resources.'); break;
-			case 404: throw new Exception('You requested a resource that does not exist.'); break;
+            case 404: throw new Exception('You requested a resource that does not exist.'); break;
+            case 405: throw new Exception('Something went wrong with your request or your resource'); break;
 			case 409: throw new Exception('Typically when trying creating a resource that already exists.'); break;
 			case 500: throw new Exception('Internal server error. Try again at a later time.'); break;
 			default:  break;
