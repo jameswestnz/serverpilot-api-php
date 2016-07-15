@@ -18,12 +18,12 @@ class Apps extends Resource
 		$results = $this->request();
 		
 		if(!is_null($server_id)) {
-			foreach($results->data as $key => $result) {
-				if($result->serverid != $server_id) unset($results->data[$key]);
+			foreach($results['data'] as $key => $result) {
+				if($result['serverid'] != $server_id) unset($results['data'][$key]);
 			}
 		}
 		
-		return $results->data;
+		return $results['data'];
 	}
 
     public function create($name, $sysuser_id, $runtime='php5.6', $domains=array(), $wordpress=null) {
